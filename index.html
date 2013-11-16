@@ -9,8 +9,7 @@
   <meta name="author" content="Gregory Shulov">
 
   
-  <meta name="description" content="Recently I wanted to test latest version of netatalk 3.0 on my Ubuntu Box.
-Unfortunately the latest binary version available for Ubuntu 12.04 is &hellip;">
+  <meta name="description" content=" Blog Archives Recent Posts ">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -67,101 +66,6 @@ Unfortunately the latest binary version available for Ubuntu 12.04 is &hellip;">
       <div class="blog-index">
   
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/11/16/automating-installation-of-netatalk-3-dot-0-x-with-ansible/">Automating Installation of Netatalk 3.0.X With Ansible</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-11-16T21:20:00+02:00" pubdate data-updated="true">Nov 16<span>th</span>, 2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Recently I wanted to test latest version of netatalk 3.0 on my Ubuntu Box.
-Unfortunately the latest binary version available for Ubuntu 12.04 is netatalk 2.2.1 from netatalk 2.X branch.
-As a result I came to do a little Ansible playbook that installs Netatalk 3.0.6 automatically.
-This article shows how to use Ansible playbook to compile, install and configure Netatalk on your machine or test latest version of Netatalk using Vagrant and VirtualBox for different Linux Distributions.</p>
-
-<h3>Installing Requirements and Getting the source</h3>
-
-<p>We need new version of Ansible to perform the installation. Instructions are available below:</p>
-
-<ol>
-<li> <a href="http://www.ansibleworks.com/docs/intro_installation.html#latest-releases-via-apt-ubuntu">Ubuntu Instructions</a></li>
-<li> <a href="http://www.ansibleworks.com/docs/intro_installation.html#latest-release-via-yum">CentOS/RedHat and Fedora Instructions</a></li>
-<li> <a href="http://www.codingspaces.com/2013/07/installing-ansible-on-os-x-via-homebrew.html">For Mac OSX just use &ldquo;brew&rdquo;</a></li>
-</ol>
-
-
-<p>Get netatalk-ansible playbook from github:</p>
-
-<pre><code>foo@myhost:~$ git clone git@github.com:GR360RY/netatalk-ansible.git
-foo@myhost:~$ cd netatalk-ansible
-</code></pre>
-
-<h3>Configuring Asible Environment</h3>
-
-<p>If you just want to test the setup with Vagrant &ndash; jump to <a href="">Vagrant</a> section.</p>
-
-<p>To be able to install and configure netatalk we will need to have ssh access to the target Linux system ( &ldquo;localhost&rdquo; in case we are doing self provisioning ). This playbook implies that &ldquo;ssh user&rdquo; will also be the owner of the AFP shares. In addition the ssh user need to have sudo privileges on the target system, as some task will require root privileges.</p>
-
-<p>For testing purposes passwordless sudo access can be configured if not available:
-Add the below line to /etc/sudoers</p>
-
-<pre><code>your_username    ALL=(ALL) NOPASSWD:ALL
-</code></pre>
-
-<p>Add your target system ip ( 127.0.0.1 for self provisioning ) to &lsquo;ansible_hosts&rsquo; as folling:</p>
-
-<pre><code>foo@myhost:~/netatalk-ansible $ cat ansible_hosts
-# List of hosts to configure netatalk on
-# 10.0.0.1
-# 192.168.0.101
-# ...
-10.0.0.3
-</code></pre>
-
-<h3></h3>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="nn">---</span>
-</span><span class='line'><span class="p-Indicator">-</span> <span class="l-Scalar-Plain">hosts</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">all</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="l-Scalar-Plain">user</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">vagrant</span>      <span class="c1"># User to access your machine over ssh that has sudo permittions</span>
-</span><span class='line'>  <span class="l-Scalar-Plain">sudo</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">yes</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
     <a href="/blog/archives">Blog Archives</a>
@@ -173,10 +77,6 @@ Add the below line to /etc/sudoers</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/blog/2013/11/16/automating-installation-of-netatalk-3-dot-0-x-with-ansible/">Automating Installation of Netatalk 3.0.X With Ansible</a>
-      </li>
     
   </ul>
 </section>
