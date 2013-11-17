@@ -4,7 +4,7 @@
   <title><![CDATA[Random IT Notes]]></title>
   <link href="http://GR360RY.github.io/atom.xml" rel="self"/>
   <link href="http://GR360RY.github.io/"/>
-  <updated>2013-11-17T20:40:14+02:00</updated>
+  <updated>2013-11-17T20:42:43+02:00</updated>
   <id>http://GR360RY.github.io/</id>
   <author>
     <name><![CDATA[Gregory Shulov]]></name>
@@ -39,6 +39,9 @@ This article shows how to use Ansible playbook to compile, install and configure
 <pre><code>foo@myhost:~$ git clone git@github.com:GR360RY/netatalk-ansible.git
 foo@myhost:~$ cd netatalk-ansible
 </code></pre>
+
+<!-- more -->
+
 
 <h3>Configuring Asible Environment</h3>
 
