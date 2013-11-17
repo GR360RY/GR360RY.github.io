@@ -4,7 +4,7 @@
   <title><![CDATA[Random IT Notes]]></title>
   <link href="http://GR360RY.github.io/atom.xml" rel="self"/>
   <link href="http://GR360RY.github.io/"/>
-  <updated>2013-11-17T03:38:37+02:00</updated>
+  <updated>2013-11-17T16:51:43+02:00</updated>
   <id>http://GR360RY.github.io/</id>
   <author>
     <name><![CDATA[Gregory Shulov]]></name>
@@ -68,19 +68,27 @@ Add the below line to <code>/etc/sudoers</code></p>
 
 <p>Add your target system ip ( 127.0.0.1 for self provisioning ) to <code>ansible_hosts</code> as folling:</p>
 
-<pre><code>foo@myhost:~/netatalk-ansible $ cat ansible_hosts
-# List of hosts to configure netatalk on
-# 10.0.0.1
-# 192.168.0.101
-# ...
-10.0.0.3
-</code></pre>
+<figure class='code'><figcaption><span>ansible_hosts</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>foo@myhost:~/netatalk-ansible <span class="nv">$ </span>cat ansible_hosts
+</span><span class='line'><span class="c"># List of hosts to configure netatalk on</span>
+</span><span class='line'><span class="c"># 10.0.0.1</span>
+</span><span class='line'><span class="c"># 192.168.0.101</span>
+</span><span class='line'><span class="c"># ...</span>
+</span><span class='line'>10.0.0.3
+</span></code></pre></td></tr></table></div></figure>
+
 
 <h3>Configure AFP Shares, Time Machine and ssh user</h3>
 
 <p>Edit <code>netatalk.yml</code> by changing vagrant user to <strong><em>your_username</em></strong> at line 4</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>netatalk.yml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -95,7 +103,8 @@ Add the below line to <code>/etc/sudoers</code></p>
 
 <p>Edit <code>vars/user_defined.yml</code> and update <strong><em>shares_list</em></strong> with desired Share Name and correct path</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>vars/user_defined.yml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -171,6 +180,79 @@ skipping: [ubuntu1204]
 </code></pre>
 
 <h2><a name="vagrant"></a>Testing setup with VirtualBox and Vagrant</h2>
+
+<p>This repository includes Vagrantfile with two Ubuntu versions that can be tested without playbook modifications.
+Currently only two distributions are tested &ndash; Ubuntu 12.04 and 12.10. Vagrant Boxes configuration is available at the top of the <code>Vagrantfile</code>:</p>
+
+<figure class='code'><figcaption><span>Vagrantfile </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">VAGRANTFILE_API_VERSION</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span>
+</span><span class='line'><span class="no">Vagrant</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="no">VAGRANTFILE_API_VERSION</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="n">machines</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>    <span class="s1">&#39;ubuntu1204&#39;</span><span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>      <span class="s1">&#39;define&#39;</span> <span class="o">=&gt;</span> <span class="ss">:ubuntu1204</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;box&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;precise64&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;url&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;http://files.vagrantup.com/precise64.box&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;ubuntu1204&quot;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="s1">&#39;ubuntu1210&#39;</span><span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>      <span class="s1">&#39;define&#39;</span> <span class="o">=&gt;</span> <span class="ss">:ubuntu1210</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;box&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;quantal64&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;url&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;http://goo.gl/wxdwM&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;ubuntu1210&quot;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Executing <code>vagrant up</code> in repository directory will create and automatically configure all boxes from Vagrantfile.
+Specific box can be tested by choosing os type as in the next example:</p>
+
+<pre><code>foo@myhost:~/netatalk-ansible $ vagrant up ubuntu1204
+</code></pre>
+
+<p>In case you want to make changes to playbook before installation, Netatalk deployment can be skipped using <code>--no-provision</code> option:</p>
+
+<pre><code>foo@myhost:~/netatalk-ansible $ vagrant up ubuntu1204 --no-provision
+</code></pre>
+
+<p>After changes to playbook are applied, run provisioning with vagrant</p>
+
+<pre><code>foo@myhost:~/netatalk-ansible $ vagrant provision ubuntu1204
+</code></pre>
+
+<p>Vagrant provision procedure can be executed as many times as you need &ndash; running provision the second time will take a fraction of the time of first provision as all components are already installed.</p>
+
+<p>VMs are configured to use bridged interface as well, so after the installation is completed, you should be able to see new AFP host ( like Ubuntu1204 ) with shared folders in Finder.</p>
+
+<p><img src="http://GR360RY.github.io/images/afp_share.jpg"></p>
+
+<p>Default User and Password: <code>vagrant:vagrant</code></p>
+
+<p><img src="http://GR360RY.github.io/images/user_password.png"></p>
+
+<p>You will be able to access configured afp share:</p>
+
+<p><img src="http://GR360RY.github.io/images/share_names.png"></p>
+
+<h2>Understanding Netatalk Configuration</h2>
 
 <p><em>To Be Continued&hellip;</em></p>
 ]]></content>
