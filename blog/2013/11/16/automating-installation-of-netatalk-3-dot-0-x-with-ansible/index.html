@@ -121,7 +121,7 @@ foo@myhost:~$ cd netatalk-ansible
 <p>To be able to install and configure netatalk we will need to have ssh access to the target Linux system ( &ldquo;localhost&rdquo; in case we are doing self provisioning ). This playbook implies that &ldquo;ssh user&rdquo; will also be the owner of the AFP shares. In addition the ssh user need to have sudo privileges on the target system, as some task will require root privileges.</p>
 
 <p>For testing purposes passwordless sudo access can be configured on target system if not available:
-Add the below line to /etc/sudoers</p>
+Add the below line to <code>/etc/sudoers</code></p>
 
 <pre><code>your_username    ALL=(ALL) NOPASSWD:ALL
 </code></pre>
@@ -140,7 +140,7 @@ Add the below line to /etc/sudoers</p>
 
 <p><strong>On OSX:</strong> Compile from source <a href="http://sourceforge.net/projects/sshpass/">http://sourceforge.net/projects/sshpass/</a> ( sshpass is not available in brew)</p>
 
-<p>Add your target system ip ( 127.0.0.1 for self provisioning ) to &lsquo;ansible_hosts&rsquo; as folling:</p>
+<p>Add your target system ip ( 127.0.0.1 for self provisioning ) to <code>ansible_hosts</code> as folling:</p>
 
 <pre><code>foo@myhost:~/netatalk-ansible $ cat ansible_hosts
 # List of hosts to configure netatalk on
@@ -152,7 +152,7 @@ Add the below line to /etc/sudoers</p>
 
 <h3>Configure AFP Shares, Time Machine and ssh user</h3>
 
-<p>Edit netatalk.yml by changing vagrant user to <strong><em>your_username</em></strong> at line 4</p>
+<p>Edit <code>netatalk.yml</code> by changing vagrant user to <strong><em>your_username</em></strong> at line 4</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -167,7 +167,7 @@ Add the below line to /etc/sudoers</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Edit vars/user_defined.yml and update <strong><em>shares_list</em></strong> with desired Share Name and correct path</p>
+<p>Edit <code>vars/user_defined.yml</code> and update <strong><em>shares_list</em></strong> with desired Share Name and correct path</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -208,6 +208,8 @@ Add the below line to /etc/sudoers</p>
 
 <h3>Copmile, Install and Configure automatically</h3>
 
+<p>The next step will take some time, depending on hardware and network speed.</p>
+
 <p>If passwordless sudo access is configured, run the following command to deploy:</p>
 
 <pre><code>foo@myhost:~/netatalk-ansible $ ansible-playbook -k -i ansible_hosts netatalk.yml
@@ -216,6 +218,92 @@ Add the below line to /etc/sudoers</p>
 <p>If not, add &ldquo;-K&rdquo; option:</p>
 
 <pre><code>foo@myhost:~/netatalk-ansible $ ansible-playbook -k -K -i ansible_hosts netatalk.yml
+</code></pre>
+
+<p>You should expect the following output:</p>
+
+<pre><code>PLAY [all] ********************************************************************
+
+GATHERING FACTS ***************************************************************
+ok: [ubuntu1204]
+ubuntu1204: importing /Users/gregs/dev/netatalk-ansible/vars/Debian.yml
+ubuntu1204: importing /Users/gregs/dev/netatalk-ansible/vars/Ubuntu.12.04.yml
+
+TASK: [Check current hostname] ************************************************
+ok: [ubuntu1204]
+
+TASK: [Update /etc/hostname file] *********************************************
+skipping: [ubuntu1204]
+
+TASK: [Update /etc/hosts file] ************************************************
+skipping: [ubuntu1204]
+
+TASK: [Change hostname] *******************************************************
+skipping: [ubuntu1204]
+
+TASK: [Get ssh user name] *****************************************************
+ok: [ubuntu1204]
+
+TASK: [Install OS Family packages required for compilation] *******************
+changed: [ubuntu1204] =&gt; (item=build-essential)
+changed: [ubuntu1204] =&gt; (item=libssl-dev)
+changed: [ubuntu1204] =&gt; (item=libgcrypt11-dev)
+changed: [ubuntu1204] =&gt; (item=libkrb5-dev)
+changed: [ubuntu1204] =&gt; (item=libpam0g-dev)
+changed: [ubuntu1204] =&gt; (item=libwrap0-dev)
+changed: [ubuntu1204] =&gt; (item=libdb-dev)
+changed: [ubuntu1204] =&gt; (item=libavahi-client-dev)
+changed: [ubuntu1204] =&gt; (item=libacl1-dev)
+changed: [ubuntu1204] =&gt; (item=libldap2-dev)
+changed: [ubuntu1204] =&gt; (item=libcrack2-dev)
+changed: [ubuntu1204] =&gt; (item=systemtap-sdt-dev)
+ok: [ubuntu1204] =&gt; (item=libdbus-1-dev)
+changed: [ubuntu1204] =&gt; (item=libdbus-glib-1-dev)
+ok: [ubuntu1204] =&gt; (item=libglib2.0-dev)
+changed: [ubuntu1204] =&gt; (item=avahi-daemon)
+
+TASK: [Install Distro specific packages required for compilation] *************
+changed: [ubuntu1204] =&gt; (item=libevent-dev)
+
+TASK: [Download netatalk-3.0.6 tarball] ***************************************
+changed: [ubuntu1204]
+
+TASK: [Extract tarball] *******************************************************
+changed: [ubuntu1204]
+
+TASK: [Compile and install netatalk-3.0.6] ************************************
+changed: [ubuntu1204] =&gt; (item=./configure --with-init-style=debian --with-cracklib --enable-krbV-uam --without-libevent --with-pam-confdir=/etc/pam.d --with-dbus-sysconf-dir=/etc/dbus-1/system.d chdir=/usr/local/src/netatalk-3.0.6 creates=.successfully_build_by_ansible)
+changed: [ubuntu1204] =&gt; (item=make chdir=/usr/local/src/netatalk-3.0.6 creates=.successfully_build_by_ansible)
+changed: [ubuntu1204] =&gt; (item=make install chdir=/usr/local/src/netatalk-3.0.6 creates=.successfully_build_by_ansible)
+changed: [ubuntu1204] =&gt; (item=touch .successfully_build_by_ansible chdir=/usr/local/src/netatalk-3.0.6 creates=.successfully_build_by_ansible)
+
+TASK: [Configure AFP Shares] **************************************************
+changed: [ubuntu1204]
+
+TASK: [Configure Avahi Service] ***********************************************
+changed: [ubuntu1204]
+
+TASK: [Verify existance of afp share folders] *********************************
+changed: [ubuntu1204] =&gt; (item={'path': '/tank/Media', 'name': 'Shared Data'})
+changed: [ubuntu1204] =&gt; (item={'path': '/tank/Downloads', 'name': 'Downloads'})
+
+TASK: [Verify existance of Time Machine Volume and set permissions accordingly] ***
+changed: [ubuntu1204]
+
+TASK: [Enable Netatalk Service] ***********************************************
+changed: [ubuntu1204]
+
+TASK: [Enable Avahi Service] **************************************************
+changed: [ubuntu1204]
+
+NOTIFIED: [restart netatalk] **************************************************
+changed: [ubuntu1204]
+
+NOTIFIED: [restart avahi] *****************************************************
+changed: [ubuntu1204]
+
+PLAY RECAP ********************************************************************
+ubuntu1204                 : ok=19   changed=16   unreachable=0    failed=0
 </code></pre>
 
 <h2><a name="vagrant"></a>Testing setup with VirtualBox and Vagrant</h2>
