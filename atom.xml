@@ -4,7 +4,7 @@
   <title><![CDATA[Random IT Notes]]></title>
   <link href="http://GR360RY.github.io/atom.xml" rel="self"/>
   <link href="http://GR360RY.github.io/"/>
-  <updated>2013-11-17T21:40:37+02:00</updated>
+  <updated>2013-11-18T08:04:12+02:00</updated>
   <id>http://GR360RY.github.io/</id>
   <author>
     <name><![CDATA[Gregory Shulov]]></name>
@@ -309,6 +309,8 @@ All setting can be found in the next files generated automatically during instal
 
 <pre><code>/etc/init.d/avahi-daemon restart
 </code></pre>
+
+<h2>Appendix:</h2>
 ]]></content>
   </entry>
   
