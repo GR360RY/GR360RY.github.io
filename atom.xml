@@ -4,7 +4,7 @@
   <title><![CDATA[Random IT Notes]]></title>
   <link href="http://GR360RY.github.io/atom.xml" rel="self"/>
   <link href="http://GR360RY.github.io/"/>
-  <updated>2013-11-21T16:44:43+02:00</updated>
+  <updated>2013-11-21T19:25:58+02:00</updated>
   <id>http://GR360RY.github.io/</id>
   <author>
     <name><![CDATA[Gregory Shulov]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Automating Installation of Netatalk 3.0.X with Ansible]]></title>
+    <title type="html"><![CDATA[Setting Up Time Machine and AFP Shares on Ubuntu with Ansible]]></title>
     <link href="http://GR360RY.github.io/blog/2013/11/16/automating-installation-of-netatalk-3-dot-0-x-with-ansible/"/>
     <updated>2013-11-16T21:20:00+02:00</updated>
     <id>http://GR360RY.github.io/blog/2013/11/16/automating-installation-of-netatalk-3-dot-0-x-with-ansible</id>
@@ -208,10 +208,22 @@ Currently only two distributions are tested &ndash; Ubuntu 12.04 and 12.10. Vagr
 <span class='line-number'>15</span>
 <span class='line-number'>16</span>
 <span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
 </pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="no">VAGRANTFILE_API_VERSION</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span>
 </span><span class='line'><span class="no">Vagrant</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="no">VAGRANTFILE_API_VERSION</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
 </span><span class='line'>
-</span><span class='line'>  <span class="n">machines</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'><span class="n">machines</span> <span class="o">=</span> <span class="p">{</span>
 </span><span class='line'>    <span class="s1">&#39;ubuntu1204&#39;</span><span class="o">=&gt;</span> <span class="p">{</span>
 </span><span class='line'>      <span class="s1">&#39;define&#39;</span> <span class="o">=&gt;</span> <span class="ss">:ubuntu1204</span><span class="p">,</span>
 </span><span class='line'>      <span class="s1">&#39;box&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;precise64&quot;</span><span class="p">,</span>
@@ -223,8 +235,20 @@ Currently only two distributions are tested &ndash; Ubuntu 12.04 and 12.10. Vagr
 </span><span class='line'>      <span class="s1">&#39;box&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;quantal64&quot;</span><span class="p">,</span>
 </span><span class='line'>      <span class="s1">&#39;url&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;http://goo.gl/wxdwM&quot;</span><span class="p">,</span>
 </span><span class='line'>      <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;ubuntu1210&quot;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="s1">&#39;ubuntu1304&#39;</span><span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>      <span class="s1">&#39;define&#39;</span> <span class="o">=&gt;</span> <span class="ss">:ubuntu1304</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;box&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;raring64&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;url&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;http://goo.gl/ceHWg&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;ubuntu1304&quot;</span>
+</span><span class='line'>    <span class="p">},</span>
+</span><span class='line'>    <span class="s1">&#39;ubuntu1310&#39;</span><span class="o">=&gt;</span> <span class="p">{</span>
+</span><span class='line'>      <span class="s1">&#39;define&#39;</span> <span class="o">=&gt;</span> <span class="ss">:ubuntu1310</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;box&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;saucy64&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;url&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;http://cloud-images.ubuntu.com/vagrant/saucy/current/saucy-server-cloudimg-amd64-vagrant-disk1.box&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s1">&#39;name&#39;</span> <span class="o">=&gt;</span> <span class="s2">&quot;ubuntu1310&quot;</span>
 </span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span>
+</span><span class='line'>
 </span></code></pre></td></tr></table></div></figure>
 
 
