@@ -284,8 +284,8 @@ skipping: [ubuntu1204]
 
 <h2><a name="vagrant"></a>Testing setup with VirtualBox and Vagrant</h2>
 
-<p>This repository includes Vagrantfile with two Ubuntu versions that can be tested without playbook modifications.
-Currently only two distributions are tested &ndash; Ubuntu 12.04 and 12.10. Vagrant Boxes configuration is available at the top of the <code>Vagrantfile</code>:</p>
+<p>This repository includes Vagrantfile with recent Ubuntu versions that can be tested without playbook modifications.
+Currently tested distributions are Ubuntu 12.04, 12.10, 13.04 and 13.10. Vagrant Boxes configuration is available at the top of the <code>Vagrantfile</code>:</p>
 
 <figure class='code'><figcaption><span>Vagrantfile </span></figcaption>
 <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -355,17 +355,10 @@ Specific box can be tested by choosing os type as in the next example:</p>
 <pre><code>foo@myhost:~/netatalk-ansible $ vagrant up ubuntu1204
 </code></pre>
 
-<p>In case you want to make changes to playbook before installation, Netatalk deployment can be skipped using <code>--no-provision</code> option:</p>
+<blockquote><p>In case you want to make changes to playbook before installation, Netatalk deployment can be skipped using `&#8211;no-provision` option:</p><p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br/></pre></td><td class='code'><pre><code class='bash'><span class='line'>foo@myhost:~/netatalk-ansible <span class="nv">$ </span>vagrant up ubuntu1204 --no-provision<br/></span></code></pre></td></tr></table></div></figure></p><p><br/>After changes to playbook are applied, run provisioning with vagrant</p><p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span><br/></pre></td><td class='code'><pre><code class='bash'><span class='line'>foo@myhost:~/netatalk-ansible <span class="nv">$ </span>vagrant provision ubuntu1204<br/></span></code></pre></td></tr></table></div></figure></p></blockquote>
 
-<pre><code>foo@myhost:~/netatalk-ansible $ vagrant up ubuntu1204 --no-provision
-</code></pre>
 
-<p>After changes to playbook are applied, run provisioning with vagrant</p>
-
-<pre><code>foo@myhost:~/netatalk-ansible $ vagrant provision ubuntu1204
-</code></pre>
-
-<p>Vagrant provision procedure can be executed as many times as you need &ndash; running provision the second time will take a fraction of the time of first provision as all components are already installed.</p>
+<p>Vagrant provision procedure can be executed as many times as you need &ndash; running provision the second time will take a fraction of the time of first run as all components are already installed.</p>
 
 <p>VMs are configured to use bridged interface as well, so after the installation is completed, you should be able to see new AFP host ( like Ubuntu1204 ) with shared folders in Finder.</p>
 
