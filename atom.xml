@@ -4,7 +4,7 @@
   <title><![CDATA[Random IT Notes]]></title>
   <link href="http://GR360RY.github.io/atom.xml" rel="self"/>
   <link href="http://GR360RY.github.io/"/>
-  <updated>2013-11-21T19:49:13+02:00</updated>
+  <updated>2013-11-25T10:07:05+02:00</updated>
   <id>http://GR360RY.github.io/</id>
   <author>
     <name><![CDATA[Gregory Shulov]]></name>
@@ -184,6 +184,10 @@ skipping: [ubuntu1204]
 
 ...
 </code></pre>
+
+<h2><em>KNOWN ISSUES:</em></h2>
+
+<p>On Ubuntu 13.04 and 13.10 netatalk service should be started manually after installation.</p>
 
 <h2><a name="vagrant"></a>Testing setup with VirtualBox and Vagrant</h2>
 
