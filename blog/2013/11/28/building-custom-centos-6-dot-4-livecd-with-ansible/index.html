@@ -1,0 +1,436 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Building Custom CentOS 6.4 LiveCD with Ansible - Random IT Notes</title>
+  <meta name="author" content="Gregory Shulov">
+
+  
+  <meta name="description" content="Preface LiveCDs can be a big help when you need to do a task that cannot be executed from within OS for some reason.
+Resizing partitions, changing &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://GR360RY.github.io/blog/2013/11/28/building-custom-centos-6-dot-4-livecd-with-ansible/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Random IT Notes" type="application/atom+xml">
+  <link href='http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-45823071-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   class="no-sidebar"  >
+  <header role="banner"><hgroup>
+  <div id="logo">
+  	<div id="logoLeft">{</div>
+  	<div id="logoText">mob</div>
+  	<div id="logoRight">}</div>
+  	<div class="clear"></div>
+  </div>
+  <h1><a href="/">Random IT Notes</a></h1>
+  
+    <h2>As stated above.</h2>
+  
+  <div class="clear"></div>
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:GR360RY.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      
+        <h1 class="entry-title">Building Custom CentOS 6.4 LiveCD With Ansible</h1>
+      
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-28T01:23:00+02:00" pubdate data-updated="true">Nov 28<span>th</span>, 2013</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>Preface</h2>
+
+<p>LiveCDs can be a big help when you need to do a task that cannot be executed from within OS for some reason.
+Resizing partitions, changing passwords and firmware updates &ndash; is just the beginning of the list.
+It is especially welcome when your machine cannot boot from network ( PXE ).</p>
+
+<p>There are lot of very good options like Knoppix, Parted Magic or LiveCDs of popular distributions.
+But there are cases when you need custom LiveCD with your scripts, packages and preinstalled software.
+Ability to modify root partition using writable snapshot on livecd, allows you to add software and modify configuration
+on the fly.</p>
+
+<!-- more -->
+
+
+<p>LiveCD can be easily flashed to usb or converted to pxe images. Hence, there are plenty of ways to get into your custom livecd.
+Booting LiveCD from network can be a great way to bootstrap your hardware before os installation.</p>
+
+<p>The standard procedure of LiveCD creation requires livecd-tools package together with kickstart file that defines packages list
+and post installation instructions. All postinstall is done using shell scripts which is far from ideal. Tools like Ansible
+are better suitable for doing exactly that. Defining system state with DSL language is much cleaner and easily maintanable.</p>
+
+<p>In the next guide I will show how to create your own custom Centos 6.4 LiveCD using step by step instructions.</p>
+
+<h2>Installing Requirements</h2>
+
+<ol>
+<li>CentOS 6.X machine.</li>
+<li>livecd-tools, git, python-argparse and ansible &ndash; all packages available in EPEL repository.</li>
+</ol>
+
+
+<p>Install EPEL repository if not already installed:</p>
+
+<pre><code>yum -y install http://ftp.nluug.nl/pub/os/Linux/distr/fedora-epel/6/i386/epel-release-6-8.noarch.rpm
+</code></pre>
+
+<p>Install required packages:</p>
+
+<pre><code>yum -y install livecd-tools git ansible python-argparse
+</code></pre>
+
+<p>Clone livecd-ansible repository:</p>
+
+<pre><code>git clone https://github.com/GR360RY/livecd-ansible.git
+</code></pre>
+
+<h2>Building LiveCD the old way</h2>
+
+<p>Let start from getting basic livecd configuration kickstart file for CentOS created by Fabian Arrotin (arrfab):</p>
+
+<pre><code>wget http://people.centos.org/arrfab/CentOS6/LiveCD-DVD/centos6-liveCD-desktop.cfg
+</code></pre>
+
+<p><code>livecd-creator</code> tool from livecd-tools package is used to create custom livecd.</p>
+
+<p>The example follows:</p>
+
+<pre><code>livecd-creator -c centos6-liveCD-desktop.cfg -f centos6-desktop
+</code></pre>
+
+<p>This will create <code>centos6-desktop.iso</code> as defined in centos6-liveCD-desktop.cfg.
+The file has standard kickstart format and contains two main parts:</p>
+
+<h4>Services configuration and packages selection:</h4>
+
+<p>This part is straightforward. Language, Keyboard and Services are self explanatory.
+The same goes for package list &ndash; contains yum groups and individual packages.</p>
+
+<figure class='code'><figcaption><span>centos6-liveCD-desktop.cfg </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>lang en_US.UTF-8
+</span><span class='line'>keyboard us
+</span><span class='line'>timezone US/Eastern
+</span><span class='line'>auth --useshadow --enablemd5
+</span><span class='line'>selinux --enforcing
+</span><span class='line'>firewall --enabled --service<span class="o">=</span>mdns
+</span><span class='line'>repo --name<span class="o">=</span>base    --baseurl<span class="o">=</span>file://REPOPATH
+</span><span class='line'>
+</span><span class='line'>xconfig --startxonboot
+</span><span class='line'>part / --size 4096 --fstype ext4
+</span><span class='line'>services --enabled<span class="o">=</span>NetworkManager --disabled<span class="o">=</span>network,sshd
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>%packages
+</span><span class='line'>syslinux
+</span><span class='line'>kernel
+</span><span class='line'>@base
+</span><span class='line'>@core
+</span><span class='line'>@basic-desktop
+</span><span class='line'>...
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>Postinstallation stage:</h4>
+
+<p>Here the real mess is starting. Triple variable escaping is a pain:</p>
+
+<pre><code>%post
+
+## default LiveCD user
+LIVECD_USER="centoslive"
+
+########################################################################
+# Create a sub-script so the output can be captured
+# Must change "$" to "\$" and "`" to "\`" to avoid shell quoting
+########################################################################
+cat &gt; /root/post-install &lt;&lt; EOF_post
+#!/bin/bash
+
+echo ###################################################################
+echo ## Creating the livesys init script
+echo ###################################################################
+</code></pre>
+
+<p>Here is an example code snipplet from centos6-liveCD-desktop.cfg</p>
+
+<figure class='code'><figcaption><span>centos6-liveCD-desktop.cfg </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>%post
+</span><span class='line'>...
+</span><span class='line'>
+</span><span class='line'>. /etc/init.d/functions
+</span><span class='line'>
+</span><span class='line'><span class="k">if</span> ! strstr <span class="s2">&quot;\\\`cat /proc/cmdline\\\`&quot;</span> liveimg <span class="o">||</span> <span class="o">[</span> <span class="s2">&quot;\\\$1&quot;</span> !<span class="o">=</span> <span class="s2">&quot;start&quot;</span> <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'><span class="k">      </span><span class="nb">exit </span>0
+</span><span class='line'>      <span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">      if</span> <span class="o">[</span> -e /.liveimg-configured <span class="o">]</span> ; <span class="k">then</span>
+</span><span class='line'><span class="k">            </span><span class="nv">configdone</span><span class="o">=</span>1
+</span><span class='line'>            <span class="k">fi</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="k">            </span>exists<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>                  which <span class="se">\\\$</span>1 &gt;/dev/null 2&gt;&amp;1 <span class="o">||</span> <span class="k">return</span>
+</span><span class='line'>                      <span class="se">\\\$</span>*
+</span><span class='line'>                      <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>...
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Maintaining your bash code is not convenient in such a way. The same goes for catching output or just plain debugging.
+As as result adding your own software to the livecd becomes a laborious task ( in case you need more then just adding an individual package)</p>
+
+<h2>Building LiveCD with Ansible</h2>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>.
+</span><span class='line'>├── roles                         <span class="c"># Ansible roles folder</span>
+</span><span class='line'>│   ├── livecd-pre-common
+</span><span class='line'>│   ├── centos-sshd-service       <span class="c"># sshd service role</span>
+</span><span class='line'>│   ├── epel-repo                 <span class="c"># epel repo setup</span>
+</span><span class='line'>│   ├── livecd-pxe-common
+</span><span class='line'>│   ├── livecd-post-common
+</span><span class='line'>│   └── livecd-isolinux-common
+</span><span class='line'>├── templates
+</span><span class='line'>│   └── centos6-mini.ks.j2        <span class="c"># Basic config template</span>
+</span><span class='line'>├── centos6-mini.yml              <span class="c"># Ansible Playbook for %post stage</span>
+</span><span class='line'>├── generate_config.py            <span class="c"># Config file Generator</span>
+</span><span class='line'>├── README.md
+</span><span class='line'>└── Vagrantfile
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>TO BE CONTINUED&hellip;</h2>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Gregory Shulov</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-28T01:23:00+02:00" pubdate data-updated="true">Nov 28<span>th</span>, 2013</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://GR360RY.github.io/blog/2013/11/28/building-custom-centos-6-dot-4-livecd-with-ansible/" data-via="" data-counturl="http://GR360RY.github.io/blog/2013/11/28/building-custom-centos-6-dot-4-livecd-with-ansible/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left articlenav" href="/blog/2013/11/16/automating-installation-of-netatalk-3-dot-0-x-with-ansible/" title="Previous Post: Setting Up Time Machine and AFP Shares on Ubuntu with Ansible">&laquo; Setting Up Time Machine and AFP Shares on Ubuntu with Ansible</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Gregory Shulov -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'randomitnotesblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://GR360RY.github.io/blog/2013/11/28/building-custom-centos-6-dot-4-livecd-with-ansible/';
+        var disqus_url = 'http://GR360RY.github.io/blog/2013/11/28/building-custom-centos-6-dot-4-livecd-with-ansible/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
