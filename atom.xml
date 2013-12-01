@@ -4,7 +4,7 @@
   <title><![CDATA[Random IT Notes]]></title>
   <link href="http://GR360RY.github.io/atom.xml" rel="self"/>
   <link href="http://GR360RY.github.io/"/>
-  <updated>2013-12-01T14:18:41+02:00</updated>
+  <updated>2013-12-01T19:56:33+02:00</updated>
   <id>http://GR360RY.github.io/</id>
   <author>
     <name><![CDATA[Gregory Shulov]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Building Custom CentOS 6.4 LiveCD with Ansible]]></title>
-    <link href="http://GR360RY.github.io/blog/2013/11/28/building-custom-centos-6-dot-4-livecd-with-ansible/"/>
-    <updated>2013-11-28T01:23:00+02:00</updated>
-    <id>http://GR360RY.github.io/blog/2013/11/28/building-custom-centos-6-dot-4-livecd-with-ansible</id>
+    <link href="http://GR360RY.github.io/blog/2013/12/01/building-custom-centos-6-dot-4-livecd-with-ansible/"/>
+    <updated>2013-12-01T01:23:00+02:00</updated>
+    <id>http://GR360RY.github.io/blog/2013/12/01/building-custom-centos-6-dot-4-livecd-with-ansible</id>
     <content type="html"><![CDATA[<h2>Preface</h2>
 
 <p>LiveCDs can be a big help when you need to do a task that cannot be executed from within OS for some reason.
