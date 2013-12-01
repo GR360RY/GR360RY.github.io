@@ -148,17 +148,17 @@ are better suitable for doing exactly that. Defining system state with DSL langu
 
 <p>Install EPEL repository if not already installed:</p>
 
-<pre><code>yum -y install http://ftp.nluug.nl/pub/os/Linux/distr/fedora-epel/6/i386/epel-release-6-8.noarch.rpm
+<pre><code># yum -y install http://ftp.nluug.nl/pub/os/Linux/distr/fedora-epel/6/i386/epel-release-6-8.noarch.rpm
 </code></pre>
 
 <p>Install required packages:</p>
 
-<pre><code>yum -y install livecd-tools git ansible python-argparse
+<pre><code># yum -y install livecd-tools git ansible python-argparse
 </code></pre>
 
 <p>Clone livecd-ansible repository:</p>
 
-<pre><code>git clone https://github.com/GR360RY/livecd-ansible.git
+<pre><code>$ git clone https://github.com/GR360RY/livecd-ansible.git
 </code></pre>
 
 <h2>Building LiveCD the old way</h2>
@@ -172,7 +172,7 @@ are better suitable for doing exactly that. Defining system state with DSL langu
 
 <p>The example follows:</p>
 
-<pre><code>livecd-creator -c centos6-liveCD-desktop.cfg -f centos6-desktop
+<pre><code># livecd-creator -c centos6-liveCD-desktop.cfg -f centos6-desktop
 </code></pre>
 
 <p>This will create <code>centos6-desktop.iso</code> as defined in centos6-liveCD-desktop.cfg.
@@ -299,7 +299,29 @@ As as result adding your own software to the livecd becomes a laborious task ( i
 
 <h2>Building LiveCD with Ansible</h2>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>Taking into acount problems presented with the conventional way of creating LiveCD, Ansible was the obvious choise for the task.
+Ansible supports &ldquo;chroot path&rdquo; as transport for playbooks which is ideal for Postinstallation Stage.</p>
+
+<p>Before I get into the details let see how the new build procedure works.</p>
+
+<pre><code>$ cd livecd-ansible
+$ ./generate_config.py centos6-mini.yml
+$ sudo -s
+# livecd-creator -c centos6-mini.ks --cache=cache -f centos6-mini
+</code></pre>
+
+<p>This will create centos6-mini.iso with only the basic packages.</p>
+
+<p>Before we used kickstart config file to &ldquo;define&rdquo; the livecd.
+From now on we will use Ansible playbook for this purpose.</p>
+
+<p>generate_config.py accepts playbook file as an argument and will generate kickstart config file.
+All postinstallation steps will be done using Ansible.</p>
+
+<p>Check out the Project Structure below:</p>
+
+<figure class='code'><figcaption><span>Project Structure </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -330,7 +352,145 @@ As as result adding your own software to the livecd becomes a laborious task ( i
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h2>TO BE CONTINUED&hellip;</h2>
+<p>centos6-mini.yml will be used to generate config file and run postinstall:</p>
+
+<figure class='code'><figcaption><span>centos-mini.yml </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+</pre></td><td class='code'><pre><code class='yaml'><span class='line'><span class="p-Indicator">-</span> <span class="l-Scalar-Plain">hosts</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">post</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">connection</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">chroot</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">sudo</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">false</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">gather_facts</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">false</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="l-Scalar-Plain">vars</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">cdlabel</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">centos6-mini</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">hostname</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">centos6-mini</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">livecd_user</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">centos</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">root_password</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">centos</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># Not used directly in playbook. Used by generate_config.py to create basic kickstart file.</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="l-Scalar-Plain">lang</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">en_US.UTF-8</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">keyboard</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">us</span>
+</span><span class='line'>    <span class="l-Scalar-Plain">timezone</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">Asia/Jerusalem</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="l-Scalar-Plain">repos_list</span><span class="p-Indicator">:</span>
+</span><span class='line'>      <span class="p-Indicator">-</span> <span class="p-Indicator">{</span> <span class="nv">name</span><span class="p-Indicator">:</span> <span class="s">&#39;a-base&#39;</span><span class="p-Indicator">,</span> <span class="nv">baseurl</span><span class="p-Indicator">:</span> <span class="s">&#39;http://mirror.isoc.org.il/pub/centos/6/os/$basearch&#39;</span> <span class="p-Indicator">}</span>
+</span><span class='line'>      <span class="p-Indicator">-</span> <span class="p-Indicator">{</span> <span class="nv">name</span><span class="p-Indicator">:</span> <span class="s">&#39;a-updates&#39;</span><span class="p-Indicator">,</span> <span class="nv">baseurl</span><span class="p-Indicator">:</span> <span class="s">&#39;http://mirror.isoc.org.il/pub/centos/6/updates/$basearch&#39;</span> <span class="p-Indicator">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1"># End of variable block used by generate_config.py</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="l-Scalar-Plain">roles</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">livecd-pre-common</span>
+</span><span class='line'>    <span class="c1"># Add your ansible roles here</span>
+</span><span class='line'>    <span class="c1"># - epel-repo</span>
+</span><span class='line'>    <span class="c1"># - centos-sshd-service</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">livecd-pxe-common</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">livecd-post-common</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="p-Indicator">-</span> <span class="l-Scalar-Plain">hosts</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">post-nochroot</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">connection</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">local</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">sudo</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">false</span>
+</span><span class='line'>  <span class="l-Scalar-Plain">gather_facts</span><span class="p-Indicator">:</span> <span class="l-Scalar-Plain">false</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="l-Scalar-Plain">roles</span><span class="p-Indicator">:</span>
+</span><span class='line'>    <span class="p-Indicator">-</span> <span class="l-Scalar-Plain">livecd-isolinux-common</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can copy or modify centos6-mini.yml to create your own livecd by adding your ansible roles below livecd-pre-common.
+Update lang, keyboard, timezone and repos_list to match your location to reduce download times. If you move livecd-ansible folder to
+a new location, rerun generate_config.py for every playbook file.</p>
+
+<h2>Debugging your Ansible Playbooks</h2>
+
+<p>livecd-creator has a hidden fiature &ndash; you can get get into the livecd chroot environmnet following the %post stage and before squashfs and iso are created.
+Let execute livecd-creator with &ldquo;-l&rdquo; parameter:</p>
+
+<pre><code># livecd-creator -l -c centos6-mini.ks --cache=cache -f centos6-mini
+</code></pre>
+
+<p>You will be dropped to shell after playbook execution:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>...
+</span><span class='line'>PLAY [post-nochroot] **********************************************************
+</span><span class='line'>
+</span><span class='line'>TASK: [livecd-isolinux-common | Get CDLABEL from isolinux.cfg] ****************
+</span><span class='line'>ok: [127.0.0.1]
+</span><span class='line'>
+</span><span class='line'>TASK: [livecd-isolinux-common | Deploy modified isolinux.cfg] *****************
+</span><span class='line'>changed: [127.0.0.1]
+</span><span class='line'>
+</span><span class='line'>PLAY RECAP ********************************************************************
+</span><span class='line'>/var/tmp/imgcreate-sP_xxo/install_root : ok=10   changed=7    unreachable=0    failed=0
+</span><span class='line'>127.0.0.1                  : ok=2    changed=1    unreachable=0    failed=0
+</span><span class='line'>
+</span><span class='line'>Launching shell. Exit to continue.
+</span><span class='line'>----------------------------------
+</span><span class='line'>bash-4.1#</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Open another terminal session and go to livecd-ansible directory. You can modify ansible playbooks directly and rerun playbook as follows:</p>
+
+<pre><code>ansible-playbook -i auto_gen_ansible_hosts-centos6-mini centos6-mini.yml
+</code></pre>
+
+<p>This procedure can be repeated as many times as you need till you satisfied with the result. Go back to chroot environment and exit the shell with Ctrl+D.
+It will complete the build procedure.</p>
 </div>
 
 
