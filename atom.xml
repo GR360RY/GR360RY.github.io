@@ -4,7 +4,7 @@
   <title><![CDATA[Random IT Notes]]></title>
   <link href="http://GR360RY.github.io/atom.xml" rel="self"/>
   <link href="http://GR360RY.github.io/"/>
-  <updated>2013-12-04T04:51:17+02:00</updated>
+  <updated>2013-12-08T09:50:56+02:00</updated>
   <id>http://GR360RY.github.io/</id>
   <author>
     <name><![CDATA[Gregory Shulov]]></name>
@@ -395,6 +395,158 @@ Let execute livecd-creator with &ldquo;-l&rdquo; parameter:</p>
 <p>This procedure can be repeated as many times as you need till you satisfied with the result. Go back to chroot environment and exit the shell with Ctrl+D.
 It will complete the build procedure.
 &hellip;</p>
+
+<h2>Testing Everething with Vagrant</h2>
+
+<p>If you don&rsquo;t have CentOS 6 laying around, you can create livecd using virtualbox and vagrant.
+Let assume that all the above componenets are already installed. The repository includes Vagrantfile together with
+provisioning part done with ansible ( Just make sure to install ansible on your machine prior to spinning up the VM).</p>
+
+<figure class='code'><figcaption><span>Vagrantfile </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># -*- mode: ruby -*-</span>
+</span><span class='line'><span class="c1"># vi: set ft=ruby :</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">VAGRANTFILE_API_VERSION</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span>
+</span><span class='line'><span class="no">Vagrant</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="no">VAGRANTFILE_API_VERSION</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="s2">&quot;centos64-x64&quot;</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">box_url</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/2creatives/vagrant-centos/releases/download/v0.1.0/centos64-x86_64-20131030.box&quot;</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">provision</span> <span class="s2">&quot;ansible&quot;</span> <span class="k">do</span> <span class="o">|</span><span class="n">ansible</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">ansible</span><span class="o">.</span><span class="n">playbook</span> <span class="o">=</span> <span class="s2">&quot;livecd-builder.yml&quot;</span>
+</span><span class='line'>    <span class="n">ansible</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="s2">&quot;host_setup_livecd&quot;</span>
+</span><span class='line'>    <span class="n">ansible</span><span class="o">.</span><span class="n">sudo</span> <span class="o">=</span> <span class="kp">true</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The above setup will configure VM with all the requirements for building livecd. <code>ansible.tags = "host_setup_livecd"</code> line
+will only run &ldquo;setup&rdquo; tasks from livecd-builder.yml playbook.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>$ vagrant up
+</span><span class='line'>Bringing machine 'default' up with 'virtualbox' provider...
+</span><span class='line'>[default] Importing base box 'centos64-x64'...
+</span><span class='line'>[default] Matching MAC address for NAT networking...
+</span><span class='line'>[default] Setting the name of the VM...
+</span><span class='line'>[default] Clearing any previously set forwarded ports...
+</span><span class='line'>[default] Creating shared folders metadata...
+</span><span class='line'>[default] Clearing any previously set network interfaces...
+</span><span class='line'>[default] Preparing network interfaces based on configuration...
+</span><span class='line'>[default] Forwarding ports...
+</span><span class='line'>[default] -- 22 => 2222 (adapter 1)
+</span><span class='line'>[default] Booting VM...
+</span><span class='line'>[default] Waiting for machine to boot. This may take a few minutes...
+</span><span class='line'>[default] Machine booted and ready!
+</span><span class='line'>[default] Mounting shared folders...
+</span><span class='line'>[default] -- /vagrant
+</span><span class='line'>[default] Running provisioner: ansible...
+</span><span class='line'>
+</span><span class='line'>PLAY [all] ********************************************************************
+</span><span class='line'>
+</span><span class='line'>GATHERING FACTS ***************************************************************
+</span><span class='line'>ok: [default]
+</span><span class='line'>
+</span><span class='line'>TASK: [epel-repo | Make sure EPEL repo is available] **************************
+</span><span class='line'>changed: [default]
+</span><span class='line'>
+</span><span class='line'>TASK: [epel-repo | Verify existence of RPM-GPG-KEY-EPEL-6] ********************
+</span><span class='line'>changed: [default]
+</span><span class='line'>
+</span><span class='line'>TASK: [livecd-builder-requirements | Install required packages] ***************
+</span><span class='line'>changed: [default] => (item=screen,git,ansible,livecd-tools,python-argparse)
+</span><span class='line'>
+</span><span class='line'>TASK: [Get livecd-ansible repository] *****************************************
+</span><span class='line'>skipping: [default]
+</span><span class='line'>
+</span><span class='line'>PLAY RECAP ********************************************************************
+</span><span class='line'>default                    : ok=4    changed=3    unreachable=0    failed=0</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you already tested your own livecd and want to build it using vagrant, modify the Vagrantfile as in the next example:
+* Remove ansible.tags line
+* Add ansible.extra_vars line with the name of your custom playbook without extension.</p>
+
+<figure class='code'><figcaption><span>Vagrantfile </span></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="c1"># -*- mode: ruby -*-</span>
+</span><span class='line'><span class="c1"># vi: set ft=ruby :</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">VAGRANTFILE_API_VERSION</span> <span class="o">=</span> <span class="s2">&quot;2&quot;</span>
+</span><span class='line'><span class="no">Vagrant</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="no">VAGRANTFILE_API_VERSION</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="s2">&quot;centos64-x64&quot;</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">box_url</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/2creatives/vagrant-centos/releases/download/v0.1.0/centos64-x86_64-20131030.box&quot;</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">provision</span> <span class="s2">&quot;ansible&quot;</span> <span class="k">do</span> <span class="o">|</span><span class="n">ansible</span><span class="o">|</span>
+</span><span class='line'>    <span class="n">ansible</span><span class="o">.</span><span class="n">playbook</span> <span class="o">=</span> <span class="s2">&quot;livecd-builder.yml&quot;</span>
+</span><span class='line'>    <span class="n">ansible</span><span class="o">.</span><span class="n">extra_vars</span> <span class="o">=</span> <span class="p">{</span> <span class="n">livecd_label</span><span class="p">:</span> <span class="s2">&quot;centos6-modified&quot;</span> <span class="p">}</span>
+</span><span class='line'>    <span class="n">ansible</span><span class="o">.</span><span class="n">sudo</span> <span class="o">=</span> <span class="kp">true</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>livecd-builder will look for centos6-modified.yml and create livecd based on roles included in your file. The resulting iso file
+will be placed in the source directory.</p>
 ]]></content>
   </entry>
   
